@@ -1,6 +1,6 @@
 <template>
   <div class="container mx-auto p-4">
-    <h1 class="text-[84px] font-normal mb-[59px] text-textColor">Article</h1>
+    <h1 class="text-[84px] font-normal mb-[59px] text-textColor">Articles</h1>
 
     <div v-if="pending" class="text-center text-gray-600 text-xl p-8">
       <p>Loading articles...</p>
