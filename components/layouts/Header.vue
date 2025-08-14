@@ -30,7 +30,7 @@
         <button
           class="rounded-full flex justify-center items-center hover:bg-gray-100 ring-1 ring-gray-200 h-[52px] w-[52px]"
         >
-          <img src="/img/flag.svg" alt="Flag" class="h-6 w-6" />
+          <img src="/img/icons/flag.svg" alt="Flag" class="h-6 w-6" />
         </button>
         <button
           class="bg-primary hover:shadow text-white px-8 py-4 font-normal rounded-[999px] cursor-pointer transition duration-300 ease-in-out h-[52px] sm:w-[142px] w-[140px]"

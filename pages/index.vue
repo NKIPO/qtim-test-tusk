@@ -21,13 +21,14 @@
       <div
         v-for="article in paginatedArticles"
         :key="article.id"
-        class="bg-white overflow-hidden flex flex-col h-full group transition-all duration-300 ease-in-out sm:hover:scale-105 sm:hover:-translate-y-2 w-[280px]"
+        class="bg-white overflow-hidden flex flex-col h-full group transition-all duration-300 ease-in-out sm:hover:scale-105 sm:hover:-translate-y-2 w-[280px] min-h-[416px]"
       >
-        <img
+        <NuxtImg
           :src="article.image"
           :alt="article.title"
           class="w-[280px] h-[280px] object-cover"
-          @error="(e) => (e.target.src = '/img/placeholder.png')"
+          placeholder="/img/placeholder.png"
+          loading="lazy"
         />
         <div class="pt-6 flex flex-col flex-grow justify-between">
           <p class="text-gray-600 line-clamp-3 mb-4">{{ article.preview }}</p>
@@ -48,8 +49,8 @@
           'disabled:opacity-30 disabled:cursor-not-allowed',
           'transition-colors duration-300 ease-in-out',
           page === 1
-            ? 'bg-white text-primary' // Default disabled style
-            : 'bg-white text-primary hover:bg-primary hover:text-white', // Enabled style with hover
+            ? 'bg-white text-primary'
+            : 'bg-white text-primary hover:bg-primary hover:text-white',
         ]"
         @click="page--"
       >
@@ -75,8 +76,8 @@
           'disabled:opacity-30 disabled:cursor-not-allowed',
           'transition-colors duration-300 ease-in-out',
           page === totalPages
-            ? 'bg-white text-primary' // Default disabled style
-            : 'bg-white text-primary hover:bg-primary hover:text-white', // Enabled style with hover
+            ? 'bg-white text-primary'
+            : 'bg-white text-primary hover:bg-primary hover:text-white',
         ]"
         @click="page++"
       >
@@ -87,8 +88,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { fetchAllPosts } from "~/repository/PostActions";
+import { useWindowSize } from "@vueuse/core";
 
 const {
   data: articles,
@@ -97,17 +99,33 @@ const {
 } = await useAsyncData("posts", () => fetchAllPosts());
 
 const page = ref(1);
-const perPage = 8; // Max 6 cards per page
+const perPage = ref(8);
+
+const { width } = useWindowSize();
+
+onMounted(() => {
+  const updatePerPage = () => {
+    if (width.value <= 1280) {
+      perPage.value = 6;
+    } else {
+      perPage.value = 8;
+    }
+  };
+
+  updatePerPage();
+
+  watch(width, updatePerPage);
+});
 
 const paginatedArticles = computed(() => {
-  const articlesData = articles.value || []; // Ensure articlesData is an array
-  const start = (page.value - 1) * perPage;
-  const end = start + perPage;
+  const articlesData = articles.value || [];
+  const start = (page.value - 1) * perPage.value;
+  const end = start + perPage.value;
   return articlesData.slice(start, end);
 });
 
 const totalPages = computed(() => {
-  return Math.ceil((articles.value?.length || 0) / perPage);
+  return Math.ceil((articles.value?.length || 0) / perPage.value);
 });
 
 const visiblePages = computed(() => {
@@ -118,7 +136,6 @@ const visiblePages = computed(() => {
   let startPage = Math.max(1, page.value - half);
   let endPage = Math.min(totalPages.value, page.value + half);
 
-  // Adjust startPage and endPage to always show maxVisiblePages if possible
   if (endPage - startPage + 1 < maxVisiblePages) {
     if (startPage === 1) {
       endPage = Math.min(totalPages.value, maxVisiblePages);

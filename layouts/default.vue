@@ -10,7 +10,3 @@
 import Header from "~/components/layouts/Header.vue";
 import Footer from "~/components/layouts/Footer.vue";
 </script>
-
-<style scoped>
-/* No custom styles needed here, Tailwind handles styling */
-</style>
